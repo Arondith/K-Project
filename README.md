@@ -1,6 +1,6 @@
 # PulseBoard API
 
-A portfolio-ready **Kotlin backend service** for tracking operational incidents through a controlled lifecycle.
+A portfolio-ready **Kotlin + Ktor incident management web application** for tracking operational incidents through a controlled lifecycle.
 
 PulseBoard demonstrates software-engineering fundamentals beyond basic CRUD: layered architecture, domain validation, explicit state transitions, repository abstraction, automated testing, CI, and a REST API built with Ktor.
 
@@ -26,6 +26,8 @@ PulseBoard demonstrates software-engineering fundamentals beyond basic CRUD: lay
 - Testable code using injected ID/time providers
 - Concurrent in-memory persistence
 - Automated CI builds
+- Responsive browser dashboard served directly by Ktor
+- Incident creation, filtering, status transitions, and deletion from the UI
 
 ## Incident lifecycle
 
@@ -85,7 +87,7 @@ cd K-Project
 gradle run
 ```
 
-The API starts on `http://localhost:8080`. You can override the port with the `PORT` environment variable.
+The application starts on `http://localhost:8080` and serves the PulseBoard dashboard at `/`. The REST API remains available under `/api/incidents`, with `/health` for service health. You can override the port with the `PORT` environment variable.
 
 ## Run tests
 
