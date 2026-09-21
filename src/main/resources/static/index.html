@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PulseBoard incident operations dashboard">
+  <title>PulseBoard — Incident Operations</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="shell topbar__inner">
+      <a class="brand" href="/" aria-label="PulseBoard home">
+        <span class="brand__mark" aria-hidden="true">P</span>
+        <span>
+          <strong>PulseBoard</strong>
+          <small>Incident Operations</small>
+        </span>
+      </a>
+
+      <div class="topbar__actions">
+        <span class="service-status" id="serviceStatus">
+          <span class="service-status__dot"></span>
+          Checking service
+        </span>
+        <button class="button button--quiet" id="refreshButton" type="button">Refresh</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="shell hero__grid">
+        <div>
+          <span class="eyebrow">Operational clarity</span>
+          <h1>Know what is happening. Know what happens next.</h1>
+          <p class="hero__copy">
+            A focused incident workspace for recording service disruptions,
+            moving them through a controlled response lifecycle, and keeping ownership visible.
+          </p>
+          <div class="hero__actions">
+            <button class="button button--primary" id="newIncidentButton" type="button">Create incident</button>
+            <a class="button button--secondary" href="/health" target="_blank" rel="noreferrer">View API health</a>
+          </div>
+        </div>
+
+        <aside class="hero__summary" aria-label="Incident summary">
+          <div class="summary__heading">
+            <div>
+              <span class="eyebrow">Current board</span>
+              <h2>Live incident picture</h2>
+            </div>
+            <span class="summary__timestamp" id="lastUpdated">Not loaded</span>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric">
+              <span>Open</span>
+              <strong id="metricOpen">0</strong>
+            </article>
+            <article class="metric">
+              <span>Investigating</span>
+              <strong id="metricInvestigating">0</strong>
+            </article>
+            <article class="metric">
+              <span>Mitigated</span>
+              <strong id="metricMitigated">0</strong>
+            </article>
+            <article class="metric">
+              <span>Resolved</span>
+              <strong id="metricResolved">0</strong>
+            </article>
+          </div>
+
+          <div class="summary__footer">
+            <span>Critical incidents</span>
+            <strong id="metricCritical">0 active</strong>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="shell">
+        <div class="workspace__heading">
+          <div>
+            <span class="eyebrow">Incident register</span>
+            <h2>Response queue</h2>
+            <p>Track ownership, severity, and the next allowed status transition.</p>
+          </div>
+
+          <div class="filters" aria-label="Incident filters">
+            <label class="search-field">
+              <span class="sr-only">Search incidents</span>
+              <input id="searchInput" type="search" placeholder="Search title, owner, description">
+            </label>
+
+            <label>
+              <span class="sr-only">Filter by status</span>
+              <select id="statusFilter">
+                <option value="">All statuses</option>
+                <option value="OPEN">Open</option>
+                <option value="INVESTIGATING">Investigating</option>
+                <option value="MITIGATED">Mitigated</option>
+                <option value="RESOLVED">Resolved</option>
+              </select>
+            </label>
+
+            <label>
+              <span class="sr-only">Filter by severity</span>
+              <select id="severityFilter">
+                <option value="">All severities</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="board">
+          <div class="board__header">
+            <span>Incident</span>
+            <span>Severity</span>
+            <span>Status</span>
+            <span>Owner</span>
+            <span>Updated</span>
+            <span class="board__actions-label">Action</span>
+          </div>
+
+          <div id="incidentList" class="incident-list" aria-live="polite"></div>
+
+          <div id="emptyState" class="empty-state" hidden>
+            <span class="empty-state__mark">—</span>
+            <h3>No incidents to show</h3>
+            <p>Create an incident or change the current filters.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lifecycle">
+      <div class="shell lifecycle__grid">
+        <div>
+          <span class="eyebrow">Controlled lifecycle</span>
+          <h2>Each state has a deliberate next step.</h2>
+          <p>
+            PulseBoard keeps incident transitions explicit rather than allowing arbitrary status changes.
+            That makes the workflow easier to reason about and test.
+          </p>
+        </div>
+
+        <div class="lifecycle__steps" aria-label="Incident lifecycle">
+          <article>
+            <span>01</span>
+            <strong>Open</strong>
+            <p>A newly reported issue awaiting active investigation.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <strong>Investigating</strong>
+            <p>The owner is identifying cause, scope, and response.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <strong>Mitigated</strong>
+            <p>Immediate impact is reduced while final resolution continues.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <strong>Resolved</strong>
+            <p>The incident is closed after recovery or remediation.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="incident-dialog" id="incidentDialog">
+    <form class="incident-form" id="incidentForm">
+      <div class="dialog__heading">
+        <div>
+          <span class="eyebrow">New incident</span>
+          <h2>Record an operational issue</h2>
+        </div>
+        <button class="dialog__close" id="closeDialogButton" type="button" aria-label="Close">×</button>
+      </div>
+
+      <div class="field">
+        <label for="titleInput">Title</label>
+        <input id="titleInput" name="title" minlength="3" maxlength="120" required placeholder="Checkout API outage">
+      </div>
+
+      <div class="field">
+        <label for="descriptionInput">Description</label>
+        <textarea id="descriptionInput" name="description" minlength="10" maxlength="2000" rows="5" required placeholder="Describe what is failing, who is affected, and what is currently known."></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="severityInput">Severity</label>
+          <select id="severityInput" name="severity" required>
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="CRITICAL">Critical</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="ownerInput">Owner</label>
+          <input id="ownerInput" name="owner" maxlength="120" placeholder="platform-team">
+        </div>
+      </div>
+
+      <p class="form-message" id="formMessage" role="status"></p>
+
+      <div class="dialog__actions">
+        <button class="button button--secondary" id="cancelDialogButton" type="button">Cancel</button>
+        <button class="button button--primary" type="submit">Create incident</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <footer class="footer">
+    <div class="shell footer__inner">
+      <span>PulseBoard · Kotlin + Ktor portfolio project</span>
+      <span>Charles Luke Templonuevo</span>
+    </div>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
