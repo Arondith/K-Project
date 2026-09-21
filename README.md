@@ -4,6 +4,10 @@ A portfolio-ready **Kotlin + Ktor incident management web application** for trac
 
 PulseBoard demonstrates software-engineering fundamentals beyond basic CRUD: layered architecture, domain validation, explicit state transitions, repository abstraction, automated testing, CI, and a REST API built with Ktor.
 
+## Project Preview
+
+![PulseBoard incident operations dashboard preview](https://d2ol7oe51mr4n9.cloudfront.net/user_3JGUTZnbwjVtgPxRXiNMsjQVIk0/edfedc4e-8263-4200-9312-f5a428808c79.png)
+
 ## Tech stack
 
 - Kotlin 2.4.20
